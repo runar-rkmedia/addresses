@@ -35,8 +35,8 @@ def csv_reader(file_name, index, length, start_time, total_number_of_lines, line
                 'vei': csv_row[4],
                 'kort_vei': csv_row[5],
                 'tettsted': csv_row[19],
-                'postnummer': csv_row[26],
-                'postnummeromrade': csv_row[27]
+                'postnummer': csv_row[27],
+                'postnummeromrade': csv_row[28]
             }
             if this_data not in data_list:
                 data_list.append(this_data)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         if file.endswith(".csv"):
             counties.append(os.path.join(directory, file))
     # counties = [
-    #     counties[18],
+    #     'data/P13_10_VEST-AGDER_Adresse.csv',
     #     # counties[12],
     #     # counties[18],
     #     # counties[18],
