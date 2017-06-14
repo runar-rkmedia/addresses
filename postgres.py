@@ -66,18 +66,40 @@ def get_post_post_code_for_post_area(post_area):
             'Did not find an address matching {}'.format(post_area))
 
 
-def get_address_from_street_name(street_name, contains=True):
-    """Return the post-code for a post-area."""
+def get_address_from_street_name(
+        street_name,
+        contains=True,
+        near_post_code=None,
+        limit=10
+):
+    """
+    Return the post-code for a post-area.
+
+    street_name: the street to lookup e.g. Kings Road
+    contains: default to True, to do partial matches. False for strict matches
+    near_post_code: provide a post_code, and will order by closest to.
+    limit: default to 10. Max entries to retrieve. use None to get all.
+    """
+    query = AddressQuery
     if contains:
-        addresses = AddressQuery\
+        query = query\
             .filter(
                 func.upper(Address.street_name)
                 .contains(func.upper(street_name))
-            ).all()
+            )
     else:
-        addresses = AddressQuery.filter(
-            Address.street_name.ilike(street_name)
-        ).all()
+        query = query\
+            .filter(
+                Address.street_name.ilike(street_name)
+            )
+    if near_post_code:
+        query = query.order_by(
+            func.abs(Address.post_code - near_post_code)
+        )
+    if limit:
+        addresses = query.limit(limit)
+    else:
+        addresses = query.all()
     if addresses:
         return addresses
     else:
@@ -90,7 +112,8 @@ def get_address_from_street_name(street_name, contains=True):
 # print(get_post_area_for_post_code(4632))
 # print(get_post_area_for_post_code(4633))
 # print(get_post_post_code_for_post_area('Kristiansand S'))
-street_search_results = get_address_from_street_name('åsas')
+street_search_results = get_address_from_street_name(
+    'åsas', near_post_code=4000)
 # street_search_results = get_address_from_street_name('åsas', True)
 for result in street_search_results:
     print(result.post_code, result.post_area, result.street_name)
