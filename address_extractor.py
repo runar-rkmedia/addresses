@@ -25,9 +25,11 @@ def get_number_of_lines_in_file(file_name):
 def csv_reader(file_name, index, length, start_time, total_number_of_lines, lines_cycled, **kwargs):
     """Read a csv-file, and convert it to python-dictionary."""
     time1 = time()
-    last_output = 0.01
+    output_interval = 0.5
+    last_output = output_interval
     this_time = time()
     data_list = []
+    data_set = set()
     lines_cycled_real = lines_cycled
     number_of_lines = get_number_of_lines_in_file(file_name)
     with open(file_name) as csv_file:
@@ -40,10 +42,11 @@ def csv_reader(file_name, index, length, start_time, total_number_of_lines, line
                 'postnummer': csv_row[27],
                 'postnummeromrade': csv_row[28]
             }
-            if this_data not in data_list:
+            if str(this_data) not in data_set:
                 data_list.append(this_data)
+                data_set.add(str(this_data))
             time2 = time()
-            if time2 - time1 > last_output:
+            if time2 - time1 >= last_output:
                 total_time_spent = time2 - start_time
                 last_lines_cycled_real = lines_cycled_real
                 line_count = data.line_num
@@ -63,7 +66,7 @@ def csv_reader(file_name, index, length, start_time, total_number_of_lines, line
 
                         strftime("%H:%M:%S", gmtime(this_time - time1))
                     ))
-                print('{:0.1f}% total, calculating this should take about {} total, with an average of {:0.0f} lines/second'.format(
+                print('{:0.1f}% total, calculating this prosess should finish in {}, with an average of {:0.0f} lines/second'.format(
                     lines_cycled_real / total_number_of_lines * 100,
                     strftime("%H:%M:%S", gmtime(
                         (total_number_of_lines - lines_cycled_real) / (
@@ -72,7 +75,7 @@ def csv_reader(file_name, index, length, start_time, total_number_of_lines, line
                     (lines_cycled_real - last_lines_cycled_real) /
                     (this_time - last_time),
                 ))
-                last_output += .5
+                last_output += output_interval
     return data_list, number_of_lines
 
 
@@ -109,7 +112,6 @@ if __name__ == '__main__':
     # print(counties)
 
     print('''Converting and shrinking data from Kartverket, total {} counties.
-           This should take about anything from 20 seconds to 10 minutes per county.
            '''.format(len(counties)))
 
     def read_and_shrink(queue_):
@@ -120,11 +122,8 @@ if __name__ == '__main__':
         adresser.append(read_csv_from_list_of_files(
             counties))
         with open(output_file, 'w') as fout:
-            json.dump(adresser, fout)
-        print('Data saved in "{}"'.format(output_file))
-        with open('data/adresser2.json', 'w') as fout:
             json.dump(adresser[0], fout)
-        print('Data saved in twice')
+        print('Data saved in "{}"'.format(output_file))
         os.system('say "your program has finished"')
         queue.put('')
 

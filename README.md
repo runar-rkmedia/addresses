@@ -19,4 +19,4 @@ kjør filen `python3 adresse.py` for å hente ut dataen og lage JSON-filen. Merk
 
 ## Tidsbruk
 
-For øyeblikket tar dette ca 5 minutter for å kjøre gjennom. Python er nok ikke optimalt for dette, men kartdataen oppdateres bare en gang i året.
+For øyeblikket tar dette ca 25 sekunder å bygge opp dataen.
