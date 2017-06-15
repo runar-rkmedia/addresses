@@ -4,6 +4,8 @@ Extract data from kartverket's .csv-files
 (http://data.kartverket.no/download/content/geodataprodukter?korttype=3637&aktualitet=All&datastruktur=All&dataskema=All)
 and shrink it to only what is needed."""
 
+# TODO: use sets instead of lists for performanvehttps://stackoverflow.com/questions/7571635/fastest-way-to-check-if-a-value-exist-in-a-list
+
 import csv
 import json
 import os
@@ -34,7 +36,7 @@ def csv_reader(file_name, index, length, start_time, total_number_of_lines, line
             this_data = {
                 'vei': csv_row[4],
                 'kort_vei': csv_row[5],
-                'tettsted': csv_row[19],
+                'tettsted': csv_row[24],
                 'postnummer': csv_row[27],
                 'postnummeromrade': csv_row[28]
             }
@@ -61,12 +63,11 @@ def csv_reader(file_name, index, length, start_time, total_number_of_lines, line
 
                         strftime("%H:%M:%S", gmtime(this_time - time1))
                     ))
-                print('{:0.1f}% total, calculating this should take about {} more, with an average of {:0.0f} lines/second'.format(
+                print('{:0.1f}% total, calculating this should take about {} total, with an average of {:0.0f} lines/second'.format(
                     lines_cycled_real / total_number_of_lines * 100,
                     strftime("%H:%M:%S", gmtime(
                         (total_number_of_lines - lines_cycled_real) / (
                             (lines_cycled_real - last_lines_cycled_real) / (this_time - last_time))
-                        - (total_time_spent)
                     )),
                     (lines_cycled_real - last_lines_cycled_real) /
                     (this_time - last_time),
@@ -85,7 +86,7 @@ def read_csv_from_list_of_files(list_of_files, time1=time()):
     for idx, county in enumerate(list_of_files):
         a, number_of_lines = csv_reader(
             county, idx, len(counties), time1, total_number_of_lines, lines_cycled, delimiter=';')
-        adresser.append(a)
+        adresser.extend(a)
         lines_cycled += number_of_lines
         time3 = time()
         if idx == len(list_of_files) - 1:
@@ -121,6 +122,10 @@ if __name__ == '__main__':
         with open(output_file, 'w') as fout:
             json.dump(adresser, fout)
         print('Data saved in "{}"'.format(output_file))
+        with open('data/adresser2.json', 'w') as fout:
+            json.dump(adresser[0], fout)
+        print('Data saved in twice')
+        os.system('say "your program has finished"')
         queue.put('')
 
     queue = Queue()
