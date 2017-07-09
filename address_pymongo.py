@@ -60,13 +60,6 @@ def get_address_from_street_name(
             {'$project': {'diff': {'$abs': {'$subtract': [
                 near_post_code, '$post_code']}}, 'doc': '$$ROOT'}},
             {'$sort': {'diff': 1}},
-            {'$project': {
-                'diff': 0,
-                '_id': 0,
-                'doc': {
-                    '_id': 0
-                }
-            }},
             {'$limit': limit},
         ])
         formated_adresses = []
