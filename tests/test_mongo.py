@@ -2,7 +2,7 @@
 """Unit-tests for adresses."""
 # import os
 import unittest
-import address
+import address_pymongo as address
 
 known_values_postareas = {
     'Kristiansand S': [
@@ -63,12 +63,13 @@ class AddressKnownValuesTests(unittest.TestCase):
     def test_get_address_from_street_name(self):
         """Test against known values for street_names"""
         for key, value in known_values_street_name.items():
-            results = address.get_address_from_street_name(key)
+            results = address.get_address_from_street_name(key, limit=1000)
             parsed_result = []
             for result in results:
+                self.maxDiff=None
                 parsed_result.append({
-                    'post_code': result.post_code,
-                    'post_area': result.post_area
+                    'post_code': result["post_code"],
+                    'post_area': result["post_area"]
                 })
             self.assertCountEqual(parsed_result, value)
 
