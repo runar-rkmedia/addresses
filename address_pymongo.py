@@ -1,5 +1,9 @@
 """Retrieval-functions for getting address-data from database"""
-from model_pymongo import collection
+if __name__ == '__main__':
+    from model_pymongo import collection
+else:
+    from .model_pymongo import collection
+
 
 
 def get_post_area_for_post_code(post_code):

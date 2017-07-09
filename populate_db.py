@@ -1,8 +1,11 @@
 """Populate database with adresses"""
 import json
 import sys
-from model import Address, Base, session, engine
 from time import time
+if __name__ == '__main__':
+    from model import Address, Base, session, engine
+else:
+    from .model import Address, Base, session, engine
 
 
 def populate_db(data, **kwargs):

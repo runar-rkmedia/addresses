@@ -10,7 +10,10 @@ import os
 import threading
 from queue import Queue
 from time import time, strftime, gmtime
-from helpers import Timer
+if __name__ == '__main__':
+    from helpers import Timer
+else:
+    from .helpers import Timer
 
 
 def get_number_of_lines_in_file(file_name):

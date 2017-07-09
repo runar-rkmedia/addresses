@@ -1,8 +1,11 @@
 """Populate database with adresses"""
 import json
 import sys
-from model_pymongo import collection
 from time import time
+if __name__ == '__main__':
+    from model_pymongo import collection
+else:
+    from .model_pymongo import collection
 
 
 def populate_db(data, **kwargs):
