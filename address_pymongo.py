@@ -17,7 +17,7 @@ def get_post_area_for_post_code(post_code):
         'post_code': post_code
     })
     if address:
-        return address["post_area"]
+        return address.get("post_area")
     else:
         raise ValueError(
             'Did not find an address matching {}'.format(post_code))
@@ -64,7 +64,8 @@ def get_location_from_address(street_name_with_house_number, post_code):
             'post_code': post_code
         }
     )
-    return address['loc']
+    if address:
+        return address.get('loc')
 
 
 def get_address_from_street_name(
@@ -140,7 +141,8 @@ def generate_list_of_stupid_road_names():
     )
     d = []
     for p in addresses:
-        d.append(p['street_name'])
+        d.append(p.get('street_name'))
+
     return d
 
 if __name__ == '__main__':
