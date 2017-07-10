@@ -1,9 +1,9 @@
 """Retrieval-functions for getting address-data from database"""
+print(__name__)
 if __name__ == '__main__':
     from model_pymongo import collection
 else:
     from .model_pymongo import collection
-
 
 
 def get_post_area_for_post_code(post_code):
@@ -43,6 +43,7 @@ def get_address_from_street_name(
         street_name,
         contains=True,
         near_post_code=0,
+        near_geo=None,
         limit=10
 ):
     """
@@ -54,14 +55,33 @@ def get_address_from_street_name(
     limit: default to 10. Max entries to retrieve. use None to get all.
     """
     if contains:
-        addresses = collection.aggregate([
-            {'$match': {'street_name': {'$regex': "^" + street_name,
-                                        '$options': 'i'}}},
-            {'$project': {'diff': {'$abs': {'$subtract': [
-                near_post_code, '$post_code']}}, 'doc': '$$ROOT'}},
-            {'$sort': {'diff': 1}},
-            {'$limit': limit},
-        ])
+        if near_geo:
+            addresses = collection.find(
+                {
+                    'street_name': {'$regex': "^" + street_name,
+                                    '$options': 'i'},
+                    "loc": {
+                        "$near": near_geo
+                    }
+                }
+            ).limit(10)
+            return addresses
+        else:
+            addresses = collection.aggregate([
+                {'$match': {'street_name': {'$regex': "^" + street_name,
+                                            '$options': 'i'}}},
+                {'$project': {'diff': {'$abs': {'$subtract': [
+                    near_post_code, '$post_code']}}, 'doc': '$$ROOT'}},
+                {'$sort': {'diff': 1}},
+                # {'$project': {
+                #     'diff': 0,
+                #     '_id': 0,
+                #     'doc': {
+                #         '_id': 0
+                #     }
+                # }},
+                {'$limit': limit},
+            ])
         formated_adresses = []
         for address in addresses:
             formated_adresses.append(address['doc'])
@@ -72,7 +92,7 @@ def get_address_from_street_name(
                 'street_name': street_name
             },
             {
-                '_id':0
+                '_id': 0
             }
         )
     if addresses:
@@ -83,4 +103,7 @@ def get_address_from_street_name(
 
 
 if __name__ == '__main__':
-    pass
+    result = get_address_from_street_name(
+        'r', near_geo=[58.13671436651572, 7.954736873662188])
+    for r in result:
+        print("{} {}\n{}".format(r['street_name'], r['post_code'], r['loc']))

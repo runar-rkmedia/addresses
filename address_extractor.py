@@ -10,6 +10,7 @@ import os
 import threading
 from queue import Queue
 from time import time, strftime, gmtime
+from utm import to_latlon
 if __name__ == '__main__':
     from helpers import Timer
 else:
@@ -21,9 +22,7 @@ def get_number_of_lines_in_file(file_name):
     with open(file_name) as f:
         for i, l in enumerate(f):  # noqa
             pass
-        return i + 1
-
-
+        return max(i + 1, 1)
 
 
 def csv_reader(file_name, timer, **kwargs):
@@ -34,16 +33,33 @@ def csv_reader(file_name, timer, **kwargs):
     with open(file_name) as csv_file:
         data = csv.reader(csv_file, **kwargs)
         for csv_row in data:
+            postnumber = None
+            try:
+                postnumber = int(csv_row[27])
+            except ValueError:
+                if csv_row[27] != "POSTNUMMER":
+                    print(csv_row[27])
+                    raise ValueError('')
             this_data = {
-                'vei': csv_row[4],
-                'kort_vei': csv_row[5],
-                'tettsted': csv_row[24],
-                'postnummer': csv_row[27],
-                'postnummeromrade': csv_row[28]
+                'vei': csv_row[4].lower(),
+                'tettsted': csv_row[24].lower(),
+                'postnummer': postnumber,
+                'postnummeromrade': csv_row[28].lower(),
             }
-            if str(this_data) not in data_set:
-                data_list.append(this_data)
-                data_set.add(str(this_data))
+            if postnumber:
+                if str(this_data) not in data_set:
+                    data_set.add(str(this_data))
+                    zone = csv_row[16]
+                    if zone == "23":
+                        geo_north = csv_row[17]
+                        geo_east = csv_row[18]
+                        loc = to_latlon(float(geo_east), float(
+                            geo_north), 33, northern=True, strict=False)
+                        this_data['loc'] = loc
+                        data_list.append(this_data)
+                    else:
+                        raise ValueError(
+                            "Got a different geo-zone than excpected. See docomentation. got zone: '{}'".format(zone))
             timer.update(data.line_num)
     return data_list
 

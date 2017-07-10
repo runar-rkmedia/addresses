@@ -8,20 +8,24 @@ else:
     from .model_pymongo import collection
 
 
-def populate_db(data, **kwargs):
+def populate_db(data, fields, **kwargs):
     """Poulate a db with adresses."""
     time1 = time()
-    output_interval = .5
+    output_interval = .1
     last_output = output_interval
     addreses = []
     for idx, entry in enumerate(data):
         # Insert an Address in the address table
         try:
-            new_address = {
-                'street_name': entry.get(kwargs.get('street_name')),
-                'post_code': int(entry.get(kwargs.get('post_code'))),
-                'post_area': entry.get(kwargs.get('post_area')),
-            }
+            new_address = {}
+            if not fields:
+                raise KeyError('Missing fields-argument.')
+            else:
+                for key, val in fields.items():
+                    value = val[0](entry.get(val[1]))
+                    if value:
+                        new_address[key] = value
+
             addreses.append(new_address)
         except ValueError:
             pass
@@ -35,11 +39,11 @@ def populate_db(data, **kwargs):
     print('Done')
 
 
-def json_to_db(json_file, **kwargs):
+def json_to_db(json_file, fields, **kwargs):
     """Retrieve all entries in a json-file and add it to db.."""
     with open(json_file) as data_file:
         address_data = json.load(data_file)
-    populate_db(address_data, **kwargs)
+    populate_db(address_data, fields, **kwargs)
 
 
 if __name__ == "__main__":
@@ -50,7 +54,11 @@ if __name__ == "__main__":
         collection.drop()
         json_to_db(
             'data/adresser.json',
-            street_name='vei',
-            post_code='postnummer',
-            post_area='postnummeromrade'
+            fields={
+                'street_name': [str, 'vei'],
+                'post_code': [int, 'postnummer'],
+                'post_area': [str, 'postnummeromrade'],
+                'place': [str, 'tettsted'],
+                'loc': [list, 'loc'],
+            },
         )
