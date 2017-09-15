@@ -1,8 +1,7 @@
 """Setup the database for ."""
 
-from sqlalchemy import Column, SmallInteger, Integer, String
+from sqlalchemy import Column, Integer, SmallInteger, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()

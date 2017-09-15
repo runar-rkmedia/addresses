@@ -1,6 +1,7 @@
 """Retrieval-functions for getting address-data from database"""
-from model import Address, session, AddressQuery
 from sqlalchemy import func
+
+from model import Address, AddressQuery, session
 
 
 def get_post_area_for_post_code(post_code):

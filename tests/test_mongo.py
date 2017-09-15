@@ -2,6 +2,7 @@
 """Unit-tests for adresses."""
 # import os
 import unittest
+
 import address_pymongo as address
 
 known_values_postareas = {

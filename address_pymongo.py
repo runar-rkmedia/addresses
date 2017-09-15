@@ -48,7 +48,6 @@ def filter_out_housenumber_from_street_name(street_name_with_house_number):
     """Return a street_name without a housenumber."""
     street_name_with_house_number = street_name_with_house_number.strip().lower()
     if street_name_with_house_number in stupid_road_names:
-        print('fuck')
         return street_name_with_house_number
     return re.sub(remove_house_number, '', street_name_with_house_number)
 
@@ -57,7 +56,6 @@ def get_location_from_address(street_name_with_house_number, post_code):
     """Return a geolocation from a street_name (ignoring housenumber)."""
     street_name = filter_out_housenumber_from_street_name(
         street_name_with_house_number)
-    print(street_name)
     address = collection.find_one(
         {
             'street_name': street_name,

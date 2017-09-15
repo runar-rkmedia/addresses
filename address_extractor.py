@@ -9,8 +9,10 @@ import json
 import os
 import threading
 from queue import Queue
-from time import time, strftime, gmtime
+from time import gmtime, strftime, time
+
 from utm import to_latlon
+
 if __name__ == '__main__':
     from helpers import Timer
 else:

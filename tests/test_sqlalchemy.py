@@ -2,6 +2,7 @@
 """Unit-tests for adresses, using sqlalchemy as backend."""
 # import os
 import unittest
+
 import address_sqlalchemy as address
 
 known_values_postareas = {

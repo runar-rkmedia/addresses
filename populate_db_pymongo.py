@@ -2,6 +2,7 @@
 import json
 import sys
 from time import time
+
 if __name__ == '__main__':
     from model_pymongo import collection
 else:
