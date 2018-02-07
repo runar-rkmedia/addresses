@@ -3,7 +3,9 @@
 # import os
 import unittest
 
-import address_pymongo as address
+from norwegian_adresses import NorAddress
+
+nor_address = NorAddress()
 
 known_values_postareas = {
     'Kristiansand S': [
@@ -18,61 +20,43 @@ known_values_post_codes = {
 }
 
 known_values_street_name = {
-    'Kongens gate': [
-        {'post_code': 1606, 'post_area': 'FREDRIKSTAD'},
-        {'post_code': 1530, 'post_area': 'MOSS'},
-        {'post_code': 1809, 'post_area': 'ASKIM'},
-        {'post_code': 153, 'post_area': 'OSLO'},
-        {'post_code': 3510, 'post_area': 'HØNEFOSS'},
-        {'post_code': 3611, 'post_area': 'KONGSBERG'},
-        {'post_code': 3210, 'post_area': 'SANDEFJORD'},
-        {'post_code': 3211, 'post_area': 'SANDEFJORD'},
-        {'post_code': 3717, 'post_area': 'SKIEN'},
-        {'post_code': 4610, 'post_area': 'KRISTIANSAND S'},
-        {'post_code': 4608, 'post_area': 'KRISTIANSAND S'},
-        {'post_code': 6002, 'post_area': 'ÅLESUND'},
-        {'post_code': 7011, 'post_area': 'TRONDHEIM'},
-        {'post_code': 7013, 'post_area': 'TRONDHEIM'},
-        {'post_code': 7012, 'post_area': 'TRONDHEIM'},
-        {'post_code': 7715, 'post_area': 'STEINKJER'},
-        {'post_code': 7713, 'post_area': 'STEINKJER'},
-        {'post_code': 8006, 'post_area': 'BODØ'},
-        {'post_code': 8514, 'post_area': 'NARVIK'},
-        {'post_code': 9950, 'post_area': 'VARDØ'},
-        {'post_code': 9900, 'post_area': 'KIRKENES'}],
-    'Bergtoras vei': [{'post_code': 4633, 'post_area': 'KRISTIANSAND S'}],
-    'Justnesveien': [{'post_code': 4634, 'post_area': 'KRISTIANSAND S'}]
-    }
-
+    'Kongens gate':
+        {
+            'post_codes': [1606, 1530, 1809, 153, 3510, 3611, 3210, 3211, 3717, 4610, 4608, 6002, 7011, 7013, 7012, 7715, 7713, 8006, 8514, 9950, 9900],
+            'post_areas': ['FREDRIKSTAD', 'MOSS', 'ASKIM', 'OSLO', 'HØNEFOSS', 'KONGSBERG', 'SANDEFJORD', 'SANDEFJORD', 'SKIEN', 'KRISTIANSAND S', 'KRISTIANSAND S', 'ÅLESUND', 'TRONDHEIM', 'TRONDHEIM', 'TRONDHEIM', 'STEINKJER', 'STEINKJER', 'BODØ', 'NARVIK', 'VARDØ', 'KIRKENES']
+        },
+    'Bergtoras vei': {'post_codes': [4633], 'post_areas': ['KRISTIANSAND S']},
+    'Justnesveien': {'post_codes': [4634], 'post_areas': ['KRISTIANSAND S']},
+}
 
 
 class AddressKnownValuesTests(unittest.TestCase):
     """Test lookup of adresses in db."""
 
-    def test_get_post_code(self):
-        """Test getting post_code for a postal area."""
-        for key, value in known_values_postareas.items():
-            result = address.get_post_code_for_post_area(key)
-            self.assertCountEqual(result, value)
-
-    def test_get_post_area_for_post_code(self):
+    def test_by_post_code(self):
         """Test getting post_area for a post-code"""
         for key, value in known_values_post_codes.items():
-            area = address.get_post_area_for_post_code(key)
+            area = nor_address.by_post_code(key)['post_area']
             self.assertEqual(area.lower(), value.lower())
 
-    def test_get_address_from_street_name(self):
+    def test_post_codes_by_post_area(self):
+        """Test getting post_code for a postal area."""
+        for key, value in known_values_postareas.items():
+            result = nor_address.post_codes_by_post_area(key)
+            self.assertCountEqual(result, value)
+
+    def test_by_street_name(self):
+        """Test getting addresses by street_name."""
+        result = nor_address.by_street_name('Bergtoras vei 2', 4633)
+        from pprint import pprint
+        self.assertEqual(result['loc'], [58.16957350413589, 8.028893827316551])
+
+    def test_by_street_name_closest_to(self):
         """Test against known values for street_names"""
         for key, value in known_values_street_name.items():
-            results = address.get_address_from_street_name(key, limit=1000)
-            parsed_result = []
-            for result in results:
-                self.maxDiff=None
-                parsed_result.append({
-                    'post_code': result["post_code"],
-                    'post_area': result["post_area"]
-                })
-            self.assertCountEqual(parsed_result, value)
+            results = nor_address.by_street_name_closest_to(key, limit=1000)
+            r_post_code = [r['post_code'] for r in results]
+            self.assertCountEqual(r_post_code, value['post_codes'])
 
 
 if __name__ == '__main__':
