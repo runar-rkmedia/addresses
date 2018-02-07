@@ -11,6 +11,15 @@ Dette prosjektet henter ut kun den informasjonen man trenger, og passer på at h
 
 Dette er absolutt ikke et komplett API.
 
+## Installere
+
+
+For å bruke API-et er det greiest å bare bruke følgende kommando, ettersom den da ikke installerer noe annet enn det som trengs til APIet i seg selv.
+
+```pip install norwegian_adresses```
+
+eller klon prosjektet.
+
 ## Generere data
 
 Hent ut .csv-filene som du trenger i lenke over, og legg dem i mappen `data` inne i denne pakken.
@@ -42,6 +51,8 @@ Mappestrukturen skal da se noe slik ut:
 │   │   ├── P13_20_FINNMARK_Adresse.csv
 │   │   └── adresser.json // Denne filen blir opprettet som et mellomledd
 ```
+
+Dette krever at det installeres noen ekstra pakker, som ikke blir installert fra pip, siden vi ikke vil installere mer enn nødvendig der. Dette vil kanskje bli splittet ut til en egen pakke senere.
 
 kjør så følgende kommandoer:
 ```
